@@ -197,9 +197,16 @@ class ApiService {
   static Future<Map<String, dynamic>> getPurchasedBooks() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    final userId = prefs.getString('user_id');
-    print(userId);
+    final userId = prefs.getInt('user_id');
+
     final url = Uri.parse('$baseUrl/books/purchased/$userId');
+
+    if (userId == null) {
+      return {
+        'success': false,
+        'error': 'User ID not found. Please login again.',
+      };
+    }
 
     if (token == null) {
       return {

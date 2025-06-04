@@ -1,25 +1,45 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 
-class BacaPage extends StatelessWidget {
+class BacaPage extends StatefulWidget {
   final int bookId;
   const BacaPage({super.key, required this.bookId});
 
-  Future<Map<String, dynamic>> _getProductDetail() async {
-    return await ApiService.getProductDetail(bookId);
+  @override
+  State<BacaPage> createState() => _BacaPageState();
+}
+
+class _BacaPageState extends State<BacaPage> {
+  late Future<Map<String, dynamic>> _bookDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookDataFuture = _loadData();
+  }
+
+  Future<Map<String, dynamic>> _loadData() async {
+    final detail = await ApiService.getProductDetail(widget.bookId);
+    final item = detail['data'];
+    final fileUrl = item['file'];
+    final document = await PDFDocument.fromURL(fileUrl);
+    return {
+      'detail': item,
+      'document': document,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: const Text(''),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: FutureBuilder(
-        future: _getProductDetail(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _bookDataFuture,
         builder: (_, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -29,11 +49,13 @@ class BacaPage extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          if (!snapshot.hasData || snapshot.data!['data'] == null) {
-            return const Center(child: Text('No Detail data found'));
+          if (!snapshot.hasData) {
+            return const Center(child: Text('No data found'));
           }
 
-          final item = snapshot.data!['data'];
+          final item = snapshot.data!['detail'];
+          final document = snapshot.data!['document'] as PDFDocument;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -50,34 +72,12 @@ class BacaPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: item['description'] != null
-                      ? Text(item['description'],
-                          style: const TextStyle(fontSize: 12))
-                      : const Text('No description available',
-                          style: TextStyle(fontSize: 12)),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.arrow_left_sharp),
-                      label: const Text(""),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          fixedSize: const Size(60, 30)),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.arrow_right_sharp),
-                      label: const Text(""),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          fixedSize: const Size(60, 30)),
-                    ),
-                  ],
+                  child: PDFViewer(
+                    document: document,
+                    lazyLoad: false,
+                    zoomSteps: 1,
+                    numberPickerConfirmWidget: const Text("Confirm"),
+                  ),
                 )
               ],
             ),

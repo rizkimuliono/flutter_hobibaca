@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
+import '../services/api_service.dart';
 import 'detail_page.dart';
 
 class CollectionPage extends StatefulWidget {
@@ -23,14 +23,22 @@ class _CollectionPageState extends State<CollectionPage> {
     });
 
     try {
-      final data = await ApiService.getProducts();
-      final fetchedBooks = data['data'] ?? [];
+      final data = await ApiService.getPurchasedBooks();
 
-      setState(() {
-        books = fetchedBooks;
-        filteredBooks = fetchedBooks;
-        isLoading = false;
-      });
+      if (data['status'] == 'success' && data['data'] != null) {
+        final fetchedBooks = data['data'];
+
+        setState(() {
+          books = fetchedBooks;
+          filteredBooks = fetchedBooks;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          hasError = true;
+        });
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -104,104 +112,113 @@ class _CollectionPageState extends State<CollectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : hasError || books.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Data tidak tersedia.\nPeriksa koneksi internet Anda.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.red),
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: loadData,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "My Collection Book’s",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.green),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: searchController,
-                                    onChanged: filterSearch,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Cari Buku Koleksi Anda...',
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
+        child: Column(
+          children: [
+            Text(
+              hasError ? 'Gagal memuat data: Cek token atau koneksi.' : '',
+              style: const TextStyle(color: Colors.red),
+            ),
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : hasError || books.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'Data tidak tersedia.\nPeriksa koneksi internet Anda.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16, color: Colors.red),
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: loadData,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "My Collection Book’s",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.green),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.search,
-                                      color: Colors.green),
-                                  onPressed: () =>
-                                      filterSearch(searchController.text),
-                                )
-                              ],
-                            ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: searchController,
+                                        onChanged: filterSearch,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Cari Buku Koleksi Anda...',
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.search,
+                                          color: Colors.green),
+                                      onPressed: () =>
+                                          filterSearch(searchController.text),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                "Recent Read",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 15),
+                              SizedBox(
+                                height: 190,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: filteredBooks.take(6).length,
+                                  itemBuilder: (_, index) {
+                                    final book = filteredBooks[index];
+                                    return buildBookCard(book);
+                                  },
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                "My Collection",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 15),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: filteredBooks.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  childAspectRatio: 0.6,
+                                ),
+                                itemBuilder: (_, index) {
+                                  final book = filteredBooks[index];
+                                  return buildBookCard(book);
+                                },
+                              )
+                            ],
                           ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "Recent Read",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 15),
-                          SizedBox(
-                            height: 190,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: filteredBooks.take(6).length,
-                              itemBuilder: (_, index) {
-                                final book = filteredBooks[index];
-                                return buildBookCard(book);
-                              },
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "My Collection",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 15),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: filteredBooks.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.6,
-                            ),
-                            itemBuilder: (_, index) {
-                              final book = filteredBooks[index];
-                              return buildBookCard(book);
-                            },
-                          )
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+          ],
+        ),
       ),
     );
   }

@@ -78,51 +78,57 @@ class TransactionPage extends StatelessWidget {
         elevation: 0,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-          future: loadTransactions(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-      
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
-      
-            final transactions = snapshot.data ?? [];
-      
-            if (transactions.isEmpty) {
-              return const Center(child: Text("Belum ada transaksi."));
-            }
-      
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              scrollDirection: Axis.vertical,
-              child: DataTable(
-                headingRowColor: MaterialStateProperty.all(
-                    const Color.fromARGB(51, 28, 255, 8)),
-                border: TableBorder.all(color: Colors.grey.shade300),
-                columnSpacing: 16,
-                columns: const [
-                  DataColumn(label: Text('No')),
-                  DataColumn(label: Text('Tanggal')),
-                  DataColumn(label: Text('Keterangan')),
-                  DataColumn(label: Text('Nominal')),
-                  DataColumn(label: Text('Status')),
-                ],
-                rows: List.generate(transactions.length, (index) {
-                  final tx = transactions[index];
-                  return DataRow(cells: [
-                    DataCell(Text('${index + 1}')),
-                    DataCell(Text(formatDate(tx['created_at']))),
-                    DataCell(Text(tx['keterangan'] ?? '-')),
-                    DataCell(Text(formatCurrency(tx['biaya'] ?? '0'))),
-                    DataCell(getStatusWidget(tx['status'] ?? 0)),
-                  ]);
-                }),
-              ),
-            );
-          },
-        ),
+        future: loadTransactions(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+
+          final transactions = snapshot.data ?? [];
+
+          if (transactions.isEmpty) {
+            return const Center(child: Text("Belum ada transaksi."));
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+              headingRowColor: MaterialStateProperty.all(
+                  const Color.fromARGB(51, 28, 255, 8)),
+              border: TableBorder.all(color: Colors.grey.shade300),
+              columnSpacing: 16,
+              columns: const [
+                DataColumn(label: Text('No')),
+                DataColumn(label: Text('Tanggal')),
+                DataColumn(label: Text('Keterangan')),
+                DataColumn(label: Text('Nominal')),
+                DataColumn(label: Text('Status')),
+              ],
+              rows: List.generate(transactions.length, (index) {
+                final tx = transactions[index];
+                return DataRow(cells: [
+                  DataCell(Text('${index + 1}')),
+                  DataCell(Text(formatDate(tx['created_at']))),
+                  DataCell(
+                    Text(
+                      (tx['keterangan'] ?? '-').toString().length > 15
+                          ? '${tx['keterangan'].toString().substring(0, 15)}...'
+                          : tx['keterangan'].toString(),
+                    ),
+                  ),
+                  DataCell(Text(formatCurrency(tx['biaya'] ?? '0'))),
+                  DataCell(getStatusWidget(tx['status'] ?? 0)),
+                ]);
+              }),
+            ),
+          );
+        },
+      ),
     );
   }
 }
