@@ -22,15 +22,16 @@ class _CollectionPageState extends State<CollectionPage> {
       hasError = false;
     });
 
-    try {
-      final data = await ApiService.getPurchasedBooks();
+    final data = await ApiService.getPurchasedBooks();
+    print('API response: $data');
 
-      if (data['status'] == 'success' && data['data'] != null) {
-        final fetchedBooks = data['data'];
-
+    // Error karena token/user_id/koneksi
+    if (data['success'] == false) {
+      if (data['error'] == 'Failed to load books') {
+        // anggap tidak error jaringan, hanya data kosong
         setState(() {
-          books = fetchedBooks;
-          filteredBooks = fetchedBooks;
+          books = [];
+          filteredBooks = [];
           isLoading = false;
         });
       } else {
@@ -39,12 +40,17 @@ class _CollectionPageState extends State<CollectionPage> {
           hasError = true;
         });
       }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        hasError = true;
-      });
+      return;
     }
+
+    // Berhasil terhubung ke server, meskipun datanya kosong
+    final fetchedBooks = data['data'] ?? [];
+
+    setState(() {
+      books = fetchedBooks;
+      filteredBooks = fetchedBooks;
+      isLoading = false;
+    });
   }
 
   @override
@@ -112,21 +118,23 @@ class _CollectionPageState extends State<CollectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 50),
-            Text(
-              hasError ? 'Gagal memuat data: \nPeriksa koneksi internet Anda.\n' : '',
-              style: const TextStyle(color: Colors.red),
-            ),
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : hasError
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Gagal memuat data.\nPeriksa koneksi internet Anda.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                    ),
+                  )
                 : books.isEmpty
                     ? const Center(
                         child: Text(
-                          'Belum Data Koleksi Anda...',
-                          textAlign: TextAlign.center,
+                          'Belum ada buku dalam koleksi Anda.',
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       )
@@ -138,6 +146,7 @@ class _CollectionPageState extends State<CollectionPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              const SizedBox(height: 10),
                               const Text(
                                 "My Collection Book’s",
                                 style: TextStyle(
@@ -219,8 +228,6 @@ class _CollectionPageState extends State<CollectionPage> {
                           ),
                         ),
                       ),
-          ],
-        ),
       ),
     );
   }

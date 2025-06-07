@@ -7,21 +7,32 @@ class TransactionPage extends StatelessWidget {
   const TransactionPage({super.key});
 
   Future<List<Map<String, dynamic>>> loadTransactions() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('user_id');
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getInt('user_id');
 
-    if (userId == null) {
-      throw Exception("User ID tidak ditemukan di SharedPreferences");
-    }
-
-    final response = await ApiService.getTransactions(userId);
-    if (response['status'] == 'success') {
-      final data = response['data'] as List;
-      return data.map((e) => e as Map<String, dynamic>).toList();
-    } else {
-      throw Exception('\nGagal mengambil data transaksi \nPeriksa jaringan internet...!');
-    }
+  if (userId == null) {
+    throw Exception("User ID tidak ditemukan di SharedPreferences");
   }
+
+  final response = await ApiService.getTransactions(userId);
+
+  if (response == null) {
+    throw Exception("Gagal mengambil data transaksi");
+  }
+
+  if (response['data'] == null) {
+    throw Exception("Data transaksi tidak ditemukan");
+  }
+
+  if (response['status'] == 'success') {
+    final data = response['data'] as List;
+    return data.map((e) => e as Map<String, dynamic>).toList();
+  }
+
+  // ⛔ jika status bukan 'success', berikan throw/return
+  throw Exception("Status response bukan success");
+}
+
 
   String formatDate(String dateString) {
     try {

@@ -42,7 +42,7 @@ class ApiService {
       } else {
         final error = json.decode(response.body);
         print("ada error: $error");
-        
+
         String errorMessage = error['message'] ?? 'Terjadi kesalahan.';
         // Jika ada field "errors", gabungkan semua isi error-nya
         if (error['errors'] != null && error['errors'] is Map) {
@@ -225,6 +225,9 @@ class ApiService {
           'Accept': 'application/json',
         },
       );
+
+      print("HTTP status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
