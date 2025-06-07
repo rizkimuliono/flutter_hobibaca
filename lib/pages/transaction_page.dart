@@ -19,7 +19,7 @@ class TransactionPage extends StatelessWidget {
       final data = response['data'] as List;
       return data.map((e) => e as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Gagal mengambil data transaksi');
+      throw Exception('\nGagal mengambil data transaksi \nPeriksa jaringan internet...!');
     }
   }
 

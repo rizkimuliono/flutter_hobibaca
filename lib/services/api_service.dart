@@ -6,7 +6,7 @@ class ApiService {
   // static const String baseUrl = 'https://reqres.in/api'; // For Website API
   // static const String baseUrl = 'http://10.0.2.2:8000/api';//ANDORID IP
   static const String baseUrl =
-      'http://127.0.0.1:8000/api'; // For iOS simulator
+      'https://hobibaca.my.id/api'; // For iOS simulator
 
   static const Map<String, String> headers = {
     'x-api-key': 'reqres-free-v1',
@@ -34,13 +34,15 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print(data);
         return {
           'success': true,
           'data': data,
         };
       } else {
         final error = json.decode(response.body);
-        // print(error);
+        print("ada error: $error");
+        
         String errorMessage = error['message'] ?? 'Terjadi kesalahan.';
         // Jika ada field "errors", gabungkan semua isi error-nya
         if (error['errors'] != null && error['errors'] is Map) {

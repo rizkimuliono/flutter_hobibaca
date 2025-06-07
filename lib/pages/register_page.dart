@@ -38,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', result['data']['token']);
       await prefs.setInt('user_id', result['data']['id']);
-      
+
       //Ambil detail user setelah login, diambil dari api_service.dart (reuse code)
       final profileResult = await ApiService.getUserDetail();
       if (profileResult['success']) {
@@ -54,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
     } else {
-      setState(() => error = result['error']);
+      setState(() => error = result['error'] ?? 'Terjadi kesalahan, silakan coba lagi');
     }
   }
 
@@ -63,7 +63,8 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
+          // Tambahkan ini agar bisa scroll
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,22 +89,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 36),
-
-              // Nama Lengkap
               TextField(
                 controller: namaLengkapController,
                 decoration: _inputDecoration("Nama Lengkap*"),
               ),
               const SizedBox(height: 12),
-
-              // Email
               TextField(
                 controller: emailController,
                 decoration: _inputDecoration("Email *"),
               ),
               const SizedBox(height: 12),
-
-              // Password
               TextField(
                 controller: passwordController,
                 obscureText: !isPasswordVisible,
@@ -124,16 +119,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 12),
-
-              // Nomor HP
               TextField(
                 controller: nomorHPController,
                 keyboardType: TextInputType.phone,
                 decoration: _inputDecoration("Nomor HP"),
               ),
               const SizedBox(height: 24),
-
-              // Tombol Register
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -152,7 +143,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
               ),
-
               if (error.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
@@ -161,17 +151,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
-
               const SizedBox(height: 24),
-
-              // Teks Login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Sudah punya akun klik "),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context); // kembali ke halaman login
+                      Navigator.pop(context);
                     },
                     child: const Text(
                       "Login",

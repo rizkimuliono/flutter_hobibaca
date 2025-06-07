@@ -113,19 +113,21 @@ class _CollectionPageState extends State<CollectionPage> {
     return Scaffold(
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 50),
             Text(
-              hasError ? 'Gagal memuat data: Cek token atau koneksi.' : '',
+              hasError ? 'Gagal memuat data: \nPeriksa koneksi internet Anda.\n' : '',
               style: const TextStyle(color: Colors.red),
             ),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : hasError || books.isEmpty
+                : books.isEmpty
                     ? const Center(
                         child: Text(
-                          'Data tidak tersedia.\nPeriksa koneksi internet Anda.',
+                          'Belum Data Koleksi Anda...',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16, color: Colors.red),
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       )
                     : RefreshIndicator(

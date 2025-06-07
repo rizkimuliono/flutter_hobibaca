@@ -56,12 +56,12 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.menu_book, color: Colors.green, size: 80),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               const Text(
                 "HobiBaca",
                 style: TextStyle(
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Login Button
               SizedBox(

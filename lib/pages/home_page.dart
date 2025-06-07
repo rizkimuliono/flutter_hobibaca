@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.only(top: 100),
                           child: Center(
                               child: Text(
-                            'Data Tidak Tersedia, periksa jaringan internet anda!',
+                            'Tidak ada buku yang ditemukan',
                             style: TextStyle(color: Colors.redAccent),
                           )),
                         ),
