@@ -34,14 +34,14 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
+        // print(data);
         return {
           'success': true,
           'data': data,
         };
       } else {
         final error = json.decode(response.body);
-        print("ada error: $error");
+        // print("ada error: $error");
 
         String errorMessage = error['message'] ?? 'Terjadi kesalahan.';
         // Jika ada field "errors", gabungkan semua isi error-nya
@@ -160,7 +160,6 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    
     if (token == null) {
       return {
         'success': false,
@@ -177,8 +176,8 @@ class ApiService {
         },
       );
 
-      print("HTTP status: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      // print("HTTP status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -231,8 +230,8 @@ class ApiService {
         },
       );
 
-      print("HTTP status: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      // print("HTTP status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -375,8 +374,7 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final userId = prefs.getInt('user_id');
-
-    final url = Uri.parse('$baseUrl/transactions/user/$userId');
+    final url = Uri.parse('$baseUrl/transactions/check/$userId/$bookId');
 
     if (token == null) {
       return false;
@@ -391,11 +389,13 @@ class ApiService {
         },
       );
 
+      // print("HTTP status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        final data = jsonData['data'] as List;
-        return data
-            .any((item) => item['book_id'] == bookId && item['status'] == 1);
+        final data = jsonData['data'];
+        return data != null && data.isNotEmpty;
       } else {
         return false;
       }
@@ -434,7 +434,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(response.body);
       } else {
-        print(json.decode(response.body));
+        // print(json.decode(response.body));
         return {
           'success': false,
           'message': 'Topup Gagal!',

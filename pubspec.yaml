@@ -15,6 +15,7 @@ dependencies:
   intl:
   provider:
   easy_pdf_viewer:
+  cached_network_image:
   
 
 dev_dependencies:

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../services/api_service.dart';
 import '../providers/saldo_provider.dart';
 import 'detail_page.dart';
@@ -163,34 +165,63 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              item['image'] ?? '',
+                            child: CachedNetworkImage(
+                              imageUrl: item['image'] ?? '',
                               height: 150,
                               width: 120,
                               fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  height: 150,
-                                  width: 120,
-                                  color: Colors.grey.shade200,
-                                  alignment: Alignment.center,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.green),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (_, __, ___) => Container(
+                              placeholder: (context, url) => Container(
+                                height: 150,
+                                width: 120,
+                                color: Colors.grey.shade200,
+                                alignment: Alignment.center,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.green),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
                                 height: 150,
                                 width: 120,
                                 color: Colors.grey.shade300,
                                 alignment: Alignment.center,
                                 child: const Icon(Icons.image, size: 40),
                               ),
+                              memCacheHeight:
+                                  300, // Opsional: Batasi ukuran cache
+                              memCacheWidth:
+                                  240, // Opsional: Batasi ukuran cache
                             ),
+                            
+                            // child: Image.network(
+                            //   item['image'] ?? '',
+                            //   height: 150,
+                            //   width: 120,
+                            //   fit: BoxFit.cover,
+                            //   loadingBuilder:
+                            //       (context, child, loadingProgress) {
+                            //     if (loadingProgress == null) return child;
+                            //     return Container(
+                            //       height: 150,
+                            //       width: 120,
+                            //       color: Colors.grey.shade200,
+                            //       alignment: Alignment.center,
+                            //       child: const CircularProgressIndicator(
+                            //         strokeWidth: 3,
+                            //         valueColor: AlwaysStoppedAnimation<Color>(
+                            //             Colors.green),
+                            //       ),
+                            //     );
+                            //   },
+                            //   errorBuilder: (_, __, ___) => Container(
+                            //     height: 150,
+                            //     width: 120,
+                            //     color: Colors.grey.shade300,
+                            //     alignment: Alignment.center,
+                            //     child: const Icon(Icons.image, size: 40),
+                            //   ),
+                            // ),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -317,7 +348,8 @@ class _HomePageState extends State<HomePage> {
                           child: Center(
                               child: Text(
                             'Belum ada buku yang tersedia.',
-                            style: TextStyle(color: Colors.redAccent, fontSize: 16),
+                            style: TextStyle(
+                                color: Colors.redAccent, fontSize: 16),
                           )),
                         ),
                       if (products.isNotEmpty) ...[

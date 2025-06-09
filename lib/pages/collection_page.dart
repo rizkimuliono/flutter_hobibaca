@@ -23,7 +23,7 @@ class _CollectionPageState extends State<CollectionPage> {
     });
 
     final data = await ApiService.getPurchasedBooks();
-    print('API response: $data');
+    // print('API response: $data');
 
     // Error karena token/user_id/koneksi
     if (data['success'] == false) {
