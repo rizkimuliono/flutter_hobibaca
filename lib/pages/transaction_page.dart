@@ -7,30 +7,24 @@ class TransactionPage extends StatelessWidget {
   const TransactionPage({super.key});
 
   Future<List<Map<String, dynamic>>> loadTransactions() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getInt('user_id');
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
 
-  if (userId == null) {
-    throw Exception("User ID tidak ditemukan di SharedPreferences");
-  }
+    if (userId == null) return [];
 
-  final response = await ApiService.getTransactions(userId);
+    final response = await ApiService.getTransactions(userId);
 
-  if (response == null) {
-    throw Exception("Gagal mengambil data transaksi");
-  }
+    if (response == null || response['status'] != 'success') return [];
 
-  if (response['data'] == null) {
-    throw Exception("Data transaksi tidak ditemukan");
-  }
+    final data = response['data'];
+    if (data == null || data is! List) return [];
 
-  if (response['status'] == 'success') {
-    final data = response['data'] as List;
     return data.map((e) => e as Map<String, dynamic>).toList();
+  } catch (e) {
+    // Jika terjadi kesalahan, tetap kembalikan list kosong
+    return [];
   }
-
-  // ⛔ jika status bukan 'success', berikan throw/return
-  throw Exception("Status response bukan success");
 }
 
 
@@ -102,7 +96,7 @@ class TransactionPage extends StatelessWidget {
           final transactions = snapshot.data ?? [];
 
           if (transactions.isEmpty) {
-            return const Center(child: Text("Belum ada transaksi."));
+            return const Center(child: Text("Belum ada transaksi.", style: TextStyle(fontSize: 16, color: Colors.grey)));
           }
 
           return SingleChildScrollView(
@@ -133,7 +127,7 @@ class TransactionPage extends StatelessWidget {
                     ),
                   ),
                   DataCell(Text(formatCurrency(tx['biaya'] ?? '0'))),
-                  DataCell(getStatusWidget(tx['status'] ?? 0)),
+                  DataCell(getStatusWidget(int.tryParse(tx['status'].toString()) ?? 0)),
                 ]);
               }),
             ),

@@ -45,6 +45,7 @@ class _AccountPageState extends State<AccountPage> {
     // logout();
     getUserInfo();
   }
+  
 
   @override
   Widget build(BuildContext context) {

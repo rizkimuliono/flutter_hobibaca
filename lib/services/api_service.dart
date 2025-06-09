@@ -159,6 +159,8 @@ class ApiService {
     final url = Uri.parse('$baseUrl/books');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+
+    
     if (token == null) {
       return {
         'success': false,
@@ -174,6 +176,9 @@ class ApiService {
           'Accept': 'application/json',
         },
       );
+
+      print("HTTP status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -429,7 +434,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(response.body);
       } else {
-        // print(json.decode(response.body));
+        print(json.decode(response.body));
         return {
           'success': false,
           'message': 'Topup Gagal!',

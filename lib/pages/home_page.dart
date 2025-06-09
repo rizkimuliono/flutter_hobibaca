@@ -316,8 +316,8 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.only(top: 100),
                           child: Center(
                               child: Text(
-                            'Tidak ada buku yang ditemukan',
-                            style: TextStyle(color: Colors.redAccent),
+                            'Belum ada buku yang tersedia.',
+                            style: TextStyle(color: Colors.redAccent, fontSize: 16),
                           )),
                         ),
                       if (products.isNotEmpty) ...[
