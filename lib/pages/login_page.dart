@@ -55,115 +55,117 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(Icons.menu_book, color: Colors.green, size: 80),
-              const SizedBox(height: 8),
-              const Text(
-                "HobiBaca",
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                "Login Akun",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Email field
-              TextField(
-                controller: emailController,
-                decoration: _inputDecoration("Email *"),
-              ),
-              const SizedBox(height: 16),
-
-              // Password field
-              TextField(
-                controller: passwordController,
-                obscureText: !isPasswordVisible,
-                decoration: _inputDecoration("Password *").copyWith(
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      isPasswordVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.green,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isPasswordVisible = !isPasswordVisible;
-                      });
-                    },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.menu_book, color: Colors.green, size: 80),
+                const SizedBox(height: 8),
+                const Text(
+                  "HobiBaca",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 4),
+                const Text(
+                  "Login Akun",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 40),
+        
+                // Email field
+                TextField(
+                  controller: emailController,
+                  decoration: _inputDecoration("Email *"),
+                ),
+                const SizedBox(height: 16),
+        
+                // Password field
+                TextField(
+                  controller: passwordController,
+                  obscureText: !isPasswordVisible,
+                  decoration: _inputDecoration("Password *").copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
                     ),
                   ),
-                  child: const Text(
-                    "LOGIN",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
                 ),
-              ),
-
-              if (error.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(
-                    error,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-
-              const SizedBox(height: 24),
-
-              // Register Text
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Belum punya akun klik "),
-                  GestureDetector(
-                    onTap: () {
-                      // Arahkan ke halaman registrasi
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const RegisterPage()));
-                    },
+        
+                const SizedBox(height: 20),
+        
+                // Login Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     child: const Text(
-                      "Registrasi",
+                      "LOGIN",
                       style: TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                  )
-                ],
-              )
-            ],
+                  ),
+                ),
+        
+                if (error.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      error,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+        
+                const SizedBox(height: 24),
+        
+                // Register Text
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Belum punya akun klik "),
+                    GestureDetector(
+                      onTap: () {
+                        // Arahkan ke halaman registrasi
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const RegisterPage()));
+                      },
+                      child: const Text(
+                        "Registrasi",
+                        style: TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
