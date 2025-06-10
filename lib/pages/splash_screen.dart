@@ -21,6 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkTokenValid() async {
+    await Future.delayed(const Duration(seconds: 2)); //memberi jeda 1 detik
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
