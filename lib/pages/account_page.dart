@@ -45,7 +45,6 @@ class _AccountPageState extends State<AccountPage> {
     // logout();
     getUserInfo();
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -53,151 +52,167 @@ class _AccountPageState extends State<AccountPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: futureUserDetail,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        if (!snapshot.hasData ||
-            snapshot.data == null ||
-            snapshot.data!['data'] == null) {
-          return const Center(
-            child: Text(
-              'Data tidak tersedia.\nPeriksa koneksi internet Anda.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.red),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Akun Saya"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: logout,
+            child: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.blue, fontSize: 16),
             ),
-          );
-        }
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          FutureBuilder<Map<String, dynamic>?>(
+            future: futureUserDetail,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        final user = snapshot.data!['data'];
-        final fullName = '${user['name']}';
-        final userEmail = '${user['email']}';
-        final nomorHp = '${user['no_hp']}';
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
 
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: logout,
-                              child: const Text(
-                                'Logout',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(45, 34, 255, 0),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+              if (!snapshot.hasData ||
+                  snapshot.data == null ||
+                  snapshot.data!['data'] == null) {
+                return const Center(
+                  child: Text(
+                    'Data tidak tersedia.\nPeriksa koneksi internet Anda.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.red),
+                  ),
+                );
+              }
+
+              final user = snapshot.data!['data'];
+              final fullName = '${user['name']}';
+              final userEmail = '${user['email']}';
+              final nomorHp = '${user['no_hp']}';
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 12),
-                              Text(fullName,
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                              Text(userEmail,
-                                  style: const TextStyle(color: Colors.grey)),
-                              Text(nomorHp,
-                                  style: const TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(45, 34, 255, 0),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Text(
-                                "Saldo Koin",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
+                              const SizedBox(height: 10),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(45, 34, 255, 0),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    Text(fullName,
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(userEmail,
+                                        style: const TextStyle(
+                                            color: Colors.grey)),
+                                    Text(nomorHp,
+                                        style: const TextStyle(
+                                            color: Colors.grey)),
+                                  ],
                                 ),
                               ),
+                              const SizedBox(height: 20),
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.yellow,
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: const Color.fromARGB(45, 34, 255, 0),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    const Icon(Icons.monetization_on,
-                                        color: Colors.black, size: 32),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      context
-                                          .watch<SaldoProvider>()
-                                          .saldo
-                                          .toStringAsFixed(2),
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold),
+                                    const Text(
+                                      "Saldo Koin",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 24,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.yellow,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.monetization_on,
+                                              color: Colors.black, size: 32),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            context
+                                                .watch<SaldoProvider>()
+                                                .saldo
+                                                .toStringAsFixed(2),
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
+                              const SizedBox(height: 20),
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  final userId = prefs.getInt('user_id');
+                                  if (userId != null) {
+                                    _showTopUpDialog(userId);
+                                  }
+                                },
+                                icon: const Icon(Icons.upload),
+                                label: const Text('TOP UP',
+                                    style: TextStyle(fontSize: 24)),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    fixedSize: const Size(150, 50),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    )),
+                              ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final userId = prefs.getInt('user_id');
-                            if (userId != null) {
-                              _showTopUpDialog(userId);
-                            }
-                          },
-                          icon: const Icon(Icons.upload),
-                          label: const Text('TOP UP',
-                              style: TextStyle(fontSize: 24)),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              fixedSize: const Size(150, 50)),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -228,7 +243,7 @@ class _AccountPageState extends State<AccountPage> {
                   Navigator.pop(dialogContext); // Tutup dialog top up input
 
                   final response = await ApiService.topUp(userId, nominal);
-                  
+
                   final bool isSuccess = response['success'] == true;
                   final String message =
                       response['message'] ?? 'Terjadi kesalahan';
@@ -272,6 +287,4 @@ class _AccountPageState extends State<AccountPage> {
       },
     );
   }
-
-
 }

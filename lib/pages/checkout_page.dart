@@ -8,60 +8,70 @@ import 'detail_page.dart';
 import 'success_page.dart';
 import 'gagal_page.dart';
 
-class CheckoutPage extends StatelessWidget {
+class CheckoutPage extends StatefulWidget {
   final int id;
   final String title;
   final String author;
   final String imageUrl;
   final double price;
 
-  const CheckoutPage(
-      {super.key,
-      required this.id,
-      required this.title,
-      required this.author,
-      required this.imageUrl,
-      required this.price});
+  const CheckoutPage({
+    super.key,
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.imageUrl,
+    required this.price,
+  });
+
+  @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
+
+class _CheckoutPageState extends State<CheckoutPage> {
+  bool isLoading = false;
 
   void prosesBayar(BuildContext context) async {
-    final localContext = context; // simpan context sebelum async
-    final saldoProvider = localContext.read<SaldoProvider>();
+    final saldoProvider = context.read<SaldoProvider>();
     final currentSaldo = saldoProvider.saldo;
 
-    if (currentSaldo >= price) {
+    if (currentSaldo >= widget.price) {
+      setState(() => isLoading = true);
+
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getInt('user_id');
 
       if (userId == null) {
-        if (localContext.mounted) {
-          ScaffoldMessenger.of(localContext).showSnackBar(
-            const SnackBar(content: Text('User ID tidak ditemukan')),
-          );
-        }
+        if (!mounted) return;
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User ID tidak ditemukan')),
+        );
         return;
       }
 
       final result = await ApiService.purchaseBook(
         userId: userId,
-        bookId: id,
-        keterangan: 'Pembelian Buku $title',
-        biaya: price,
+        bookId: widget.id,
+        keterangan: 'Pembelian Buku ${widget.title}',
+        biaya: widget.price,
       );
 
-      if (!localContext.mounted) return; // pastikan widget masih hidup
+      if (!mounted) return;
+      setState(() => isLoading = false);
 
       if (result['status'] == 'success') {
-        saldoProvider.updateSaldo(currentSaldo - price);
+        saldoProvider.updateSaldo(currentSaldo - widget.price);
 
         Navigator.push(
-          localContext,
+          context,
           MaterialPageRoute(
             builder: (_) => SuccessPage(
               onGoToCollection: () {
-                Navigator.pop(localContext);
+                Navigator.pop(context);
                 Navigator.pushAndRemoveUntil(
-                  localContext,
-                  MaterialPageRoute(builder: (_) => DetailPage(productId: id)),
+                  context,
+                  MaterialPageRoute(builder: (_) => DetailPage(productId: widget.id)),
                   (route) => route.isFirst,
                 );
               },
@@ -70,13 +80,13 @@ class CheckoutPage extends StatelessWidget {
         );
       } else {
         showDialog(
-          context: localContext,
+          context: context,
           builder: (_) => AlertDialog(
             title: const Text('Gagal'),
             content: Text(result['message']),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(localContext),
+                onPressed: () => Navigator.pop(context),
                 child: const Text('Tutup'),
               ),
             ],
@@ -84,14 +94,18 @@ class CheckoutPage extends StatelessWidget {
         );
       }
     } else {
-      showGagalDialog(
-          context); // ini aman karena langsung dipanggil tanpa async
+      showGagalDialog(context);
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<SaldoProvider>().loadSaldo();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Provider.of<SaldoProvider>(context, listen: false).loadSaldo();
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -112,16 +126,10 @@ class CheckoutPage extends StatelessWidget {
               children: [
                 const Text(
                   'Saldo Coin',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.yellow[100],
                     borderRadius: BorderRadius.circular(12),
@@ -133,9 +141,10 @@ class CheckoutPage extends StatelessWidget {
                       Text(
                         context.watch<SaldoProvider>().saldo.toStringAsFixed(2),
                         style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       )
                     ],
                   ),
@@ -154,7 +163,7 @@ class CheckoutPage extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
-                    imageUrl,
+                    widget.imageUrl,
                     width: 140,
                     height: 180,
                     fit: BoxFit.cover,
@@ -166,7 +175,7 @@ class CheckoutPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        widget.title,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -179,10 +188,8 @@ class CheckoutPage extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                           children: [
                             TextSpan(
-                              text: author,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                              ),
+                              text: widget.author,
+                              style: const TextStyle(fontWeight: FontWeight.normal),
                             ),
                           ],
                         ),
@@ -194,10 +201,8 @@ class CheckoutPage extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                           children: [
                             TextSpan(
-                              text: '\$${price.toString()}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              text: '\$${widget.price.toString()}',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -211,9 +216,7 @@ class CheckoutPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  prosesBayar(context);
-                },
+                onPressed: isLoading ? null : () => prosesBayar(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -221,13 +224,23 @@ class CheckoutPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  "BAYAR",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      fontSize: 18),
-                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      )
+                    : const Text(
+                        "BAYAR",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          fontSize: 18,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 50),

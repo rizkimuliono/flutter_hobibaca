@@ -17,12 +17,19 @@ dependencies:
   easy_pdf_viewer:
   cached_network_image:
   flutter_launcher_icons:
+  flutter_native_splash:
   
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon.png"
   min_sdk_android: 16
+
+flutter_native_splash:
+  color: "#388E3C"
+  image: "assets/icon.png"
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:

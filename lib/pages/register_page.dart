@@ -17,9 +17,25 @@ class _RegisterPageState extends State<RegisterPage> {
   final nomorHPController = TextEditingController();
 
   bool isPasswordVisible = false;
+  bool isLoading = false; // Tambahkan ini
   String error = '';
 
   Future<void> register() async {
+    setState(() {
+      error = '';
+      isLoading = true;
+    });
+
+    if (namaLengkapController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      setState(() {
+        error = 'Semua field * wajib diisi';
+        isLoading = false;
+      });
+      return;
+    }
+
     final result = await ApiService.register(
       namaLengkapController.text,
       emailController.text,
@@ -27,34 +43,29 @@ class _RegisterPageState extends State<RegisterPage> {
       nomorHPController.text,
     );
 
-    if (namaLengkapController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      setState(() => error = 'Semua field * wajib diisi');
-      return;
-    }
-
     if (result['success']) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', result['data']['token']);
       await prefs.setInt('user_id', result['data']['id']);
 
-      //Ambil detail user setelah login, diambil dari api_service.dart (reuse code)
       final profileResult = await ApiService.getUserDetail();
       if (profileResult['success']) {
         final user = profileResult['data'];
         await prefs.setString('name', user['name'] ?? '');
         await prefs.setString('email', user['email'] ?? '');
-        // Simpan data lainnya kalau perlu
       }
 
       if (!mounted) return;
+      setState(() => isLoading = false);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
     } else {
-      setState(() => error = result['error'] ?? 'Terjadi kesalahan, silakan coba lagi');
+      setState(() {
+        error = result['error'] ?? 'Terjadi kesalahan, silakan coba lagi';
+        isLoading = false;
+      });
     }
   }
 
@@ -64,7 +75,6 @@ class _RegisterPageState extends State<RegisterPage> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          // Tambahkan ini agar bisa scroll
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -91,17 +101,20 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 36),
               TextField(
                 controller: namaLengkapController,
+                enabled: !isLoading,
                 decoration: _inputDecoration("Nama Lengkap*"),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: emailController,
+                enabled: !isLoading,
                 decoration: _inputDecoration("Email *"),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: passwordController,
                 obscureText: !isPasswordVisible,
+                enabled: !isLoading,
                 decoration: _inputDecoration("Password *").copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -121,6 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: nomorHPController,
+                enabled: !isLoading,
                 keyboardType: TextInputType.phone,
                 decoration: _inputDecoration("Nomor HP"),
               ),
@@ -129,18 +143,27 @@ class _RegisterPageState extends State<RegisterPage> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: register,
+                  onPressed: isLoading ? null : register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    "REGISTRASI",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "REGISTRASI",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
                 ),
               ),
               if (error.isNotEmpty)
@@ -158,7 +181,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   const Text("Sudah punya akun klik "),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      if (!isLoading) {
+                        Navigator.pop(context);
+                      }
                     },
                     child: const Text(
                       "Login",

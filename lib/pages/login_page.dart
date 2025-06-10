@@ -15,10 +15,16 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isPasswordVisible = false;
+  bool isLoading = false;
   String error = '';
   Future<Map<String, dynamic>?>? futureUserDetail;
 
   Future<void> login() async {
+    setState(() {
+      isLoading = true;
+      error = '';
+    });
+
     final result = await ApiService.login(
       emailController.text,
       passwordController.text,
@@ -29,22 +35,24 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('token', result['data']['token']);
       await prefs.setInt('user_id', result['data']['id']);
 
-      //Ambil detail user setelah login, diambil dari api_service.dart (reuse code)
       final profileResult = await ApiService.getUserDetail();
       if (profileResult['success']) {
         final user = profileResult['data'];
         await prefs.setString('name', user['name'] ?? '');
         await prefs.setString('email', user['email'] ?? '');
-        // Simpan data lainnya kalau perlu
       }
 
       if (!mounted) return;
+      setState(() => isLoading = false); // Stop loading
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
     } else {
-      setState(() => error = result['error']);
+      setState(() {
+        error = result['error'];
+        isLoading = false; // Stop loading on error
+      });
     }
   }
 
@@ -79,14 +87,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-        
+
                 // Email field
                 TextField(
                   controller: emailController,
                   decoration: _inputDecoration("Email *"),
                 ),
                 const SizedBox(height: 16),
-        
+
                 // Password field
                 TextField(
                   controller: passwordController,
@@ -107,29 +115,39 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-        
+
                 const SizedBox(height: 20),
-        
+
                 // Login Button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: login,
+                    onPressed: isLoading ? null : login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      "LOGIN",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "LOGIN",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
                   ),
                 ),
-        
+
                 if (error.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -138,9 +156,9 @@ class _LoginPageState extends State<LoginPage> {
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
-        
+
                 const SizedBox(height: 24),
-        
+
                 // Register Text
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
