@@ -12,8 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  //eve.holt@reqres.in
-  //cityslicka
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isPasswordVisible = false;

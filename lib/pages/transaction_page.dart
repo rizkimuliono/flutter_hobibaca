@@ -15,7 +15,8 @@ class TransactionPage extends StatelessWidget {
 
     final response = await ApiService.getTransactions(userId);
 
-    if (response == null || response['status'] != 'success') return [];
+    // if (response == null || response['status'] != 'success') return [];
+    if (response['status'] != 'success') return [];
 
     final data = response['data'];
     if (data == null || data is! List) return [];

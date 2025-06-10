@@ -240,7 +240,7 @@ class DetailPage extends StatelessWidget {
                           return Text('Error: ${snapshot.error}');
                         }
                         final sudahDibeli = snapshot.data!;
-                        print('sudahDibeli: $sudahDibeli');
+                        // print('sudahDibeli: $sudahDibeli');
                         return Column(
                           children: [
                             if (sudahDibeli) ...[
