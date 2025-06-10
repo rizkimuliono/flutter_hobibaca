@@ -1,3 +1,3 @@
-# flutter_hobibaca
+# hobibaca
 
 A new Flutter project.

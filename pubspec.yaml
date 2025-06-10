@@ -1,5 +1,5 @@
-name: flutter_hobibaca
-description: A new Flutter project.
+name: hobi_baca
+description: Aplikasi Beli dan Baca Buku PDF.
 publish_to: 'none'
 version: 0.1.0
 
@@ -16,7 +16,13 @@ dependencies:
   provider:
   easy_pdf_viewer:
   cached_network_image:
+  flutter_launcher_icons:
   
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 16
 
 dev_dependencies:
   flutter_test:

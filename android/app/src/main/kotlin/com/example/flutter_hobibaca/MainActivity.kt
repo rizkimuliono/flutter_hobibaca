@@ -1,4 +1,4 @@
-package com.example.flutter_hobibaca
+package com.example.hobibaca
 
 import io.flutter.embedding.android.FlutterActivity
 
